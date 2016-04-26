@@ -1,17 +1,20 @@
+//required variables(packages)
 var app = require('express')();
     express = require('express'),
     http = require('http').Server(app),
     io = require('socket.io')(http),
     path = require('path'),
-    mongodb = require('mongodb'),
     bodyParser = require('body-parser');
 
-var MongoClient = mongodb.MongoClient;
-var url = 'mongodb://localhost:27017/fightcoin';
+var mongodb = require('mongodb'),
+	MongoClient = mongodb.MongoClient,
+	url = 'mongodb://localhost:27017/fightcoin';
 
+//server set
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, './client')));
 
+//SOCKET.IO
 io.on('connection', function(socket){
 
   console.log('a user connected');
@@ -22,12 +25,14 @@ io.on('connection', function(socket){
   
 });
 
+//DATABASE
 MongoClient.connect(url, function (err, db) {
   if (err) {
     console.log('!!!!!!!!!!!!     Unable to connect to the mongoDB server. Error:     !!!!!!!!!!!!', err);
-  } else {
+  } 
+  else {
     //HURRAY!! We are connected. :)
-    console.log('  :)   Connection established to   :)  ', url);
+    console.log('!!!!!!!!!!!!  :)   Connection established to   :)  !!!!!!!!!!!!');
 
     // Get the documents collection
     var collection = db.collection('users');
@@ -47,7 +52,6 @@ MongoClient.connect(url, function (err, db) {
       //Close connection
       db.close();
     });
-    
   }
 });
 
