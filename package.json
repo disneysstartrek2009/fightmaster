@@ -1,13 +1,22 @@
 {
-  "name": "fightcoin",
-  "version": "0.0.1",
-  "description": "crypto coin fight club",
-  "dependencies": {
-    "body-parser": "^1.15.0",
-    "express": "^4.13.4",
-    "mongodb": "^2.1.16",
-    "mongoose": "^4.4.12",
-    "path": "^0.12.7",
-    "socket.io": "^1.4.5"
+  "name": "node-authentication",
+  "main": "server.js",
+  "dependencies" : {
+    "express" : "~4.0.0",
+    "ejs" : "~0.8.5",
+    "mongoose" : "~3.8.1",
+    "passport" : "~0.1.17",
+    "passport-local" : "~0.1.6",
+    "passport-facebook" : "~1.0.2",
+    "passport-twitter" : "~1.0.2",
+    "passport-google-oauth" : "~0.1.5",
+    "connect-flash" : "~0.1.1",
+    "bcrypt-nodejs" : "latest",
+
+    "morgan": "~1.0.0",
+    "body-parser": "~1.0.0",
+    "cookie-parser": "~1.0.0",
+    "method-override": "~1.0.0",
+    "express-session": "~1.0.0"
   }
 }

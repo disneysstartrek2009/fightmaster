@@ -1,60 +1,43 @@
-//required variables(packages)
-var app = require('express')();
-    express = require('express'),
-    http = require('http').Server(app),
-    io = require('socket.io')(http),
-    path = require('path'),
-    bodyParser = require('body-parser');
+// server.js
 
-var mongodb = require('mongodb'),
-	MongoClient = mongodb.MongoClient,
-	url = 'mongodb://localhost:27017/fightcoin';
+// set up ======================================================================
+// get all the tools we need
+var express  = require('express');
+var app      = express();
+var port     = process.env.PORT || 8080;
+var mongoose = require('mongoose');
+var passport = require('passport');
+var flash    = require('connect-flash');
 
-//server set
-app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, './client')));
+var morgan       = require('morgan');
+var cookieParser = require('cookie-parser');
+var bodyParser   = require('body-parser');
+var session      = require('express-session');
 
-//SOCKET.IO
-io.on('connection', function(socket){
+var configDB = require('./config/database.js');
 
-  console.log('a user connected');
-  
-  socket.on('disconnect', function(){
-    console.log('user disconnected');
-  });
-  
-});
+// configuration ===============================================================
+mongoose.connect(configDB.url); // connect to our database
 
-//DATABASE
-MongoClient.connect(url, function (err, db) {
-  if (err) {
-    console.log('!!!!!!!!!!!!     Unable to connect to the mongoDB server. Error:     !!!!!!!!!!!!', err);
-  } 
-  else {
-    //HURRAY!! We are connected. :)
-    console.log('!!!!!!!!!!!!  :)   Connection established to   :)  !!!!!!!!!!!!');
+require('./config/passport')(passport); // pass passport for configuration
 
-    // Get the documents collection
-    var collection = db.collection('users');
+// set up our express application
+app.use(morgan('dev')); // log every request to the console
+app.use(cookieParser()); // read cookies (needed for auth)
+app.use(bodyParser.json()); // get information from html forms
+app.use(bodyParser.urlencoded({ extended: true }));
 
-    //Create some users
-    var user1 = {name: 'modulus admin', age: 42, roles: ['admin', 'moderator', 'user']};
-    var user2 = {name: 'modulus user', age: 22, roles: ['user']};
-    var user3 = {name: 'modulus super admin', age: 92, roles: ['super-admin', 'admin', 'moderator', 'user']};
+app.set('view engine', 'ejs'); // set up ejs for templating
 
-    // Insert some users
-    collection.insert([user1, user2, user3], function (err, result) {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log('Inserted %d documents into the "users" collection. The documents inserted with "_id" are:', result.length, result);
-      }
-      //Close connection
-      db.close();
-    });
-  }
-});
+// required for passport
+app.use(session({ secret: 'ilovescotchscotchyscotchscotch' })); // session secret
+app.use(passport.initialize());
+app.use(passport.session()); // persistent login sessions
+app.use(flash()); // use connect-flash for flash messages stored in session
 
-http.listen(1337, function() {
-  console.log('cool stuff on: 1337');
-});
+// routes ======================================================================
+require('./app/routes.js')(app, passport); // load our routes and pass in our app and fully configured passport
+
+// launch ======================================================================
+app.listen(port);
+console.log('The magic happens on port ' + port);
